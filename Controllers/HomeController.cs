@@ -36,6 +36,19 @@ namespace SlackMVCBack.Controllers
 
         }
 
+        [HttpGet]
+        [Route("/users")]
+        public IActionResult getUsers()
+        {
+            //recuperer une liste de users
+
+            var users = _context.Users;
+
+            //renvoyer la liste en json
+
+            return Json(users);
+        }
+
         // 1. Cette méthode doit effectuer une requête HTTP GET :'http://localhost:3000/threads pour récupérer la liste des threads
         [HttpGet]
         [Route("/threads")]
@@ -146,6 +159,17 @@ namespace SlackMVCBack.Controllers
             return Json(mon_messages);
         }
 
+        // 3. 
+        public IActionResult GetMessages(int? threadId)
+        {
+            IQueryable<Message> messages = _context.Messages;
+            if (threadId != null)
+            {
+                messages = messages.Where(m => m.ThreadId == threadId);
+            }
+
+            return Ok(messages);
+        }
 
         // 4. Cette méthode doit effectuer une requête HTTP POST vers 'http://localhost:3000/messages' 
         //pour créer un nouveau message
@@ -171,6 +195,24 @@ namespace SlackMVCBack.Controllers
                 // Gérez l'exception de manière appropriée (journalisation, renvoi d'un message d'erreur, etc.)
                 return StatusCode(500, "Une erreur interne s'est produite lors de la création du message.");
             }
+
+        }
+
+        // 6.
+        [HttpDelete]
+        [Route("/messages/{id}")]
+        public IActionResult deleteMessage(int id)
+        {
+            Console.WriteLine($"------deleteMessage {id}--------");
+
+            var messages = _context.Messages.Find(id);
+
+            _context.Messages.Remove(messages);
+
+            _context.SaveChanges();
+
+            return Ok();
+
         }
 
         public IActionResult Index()
